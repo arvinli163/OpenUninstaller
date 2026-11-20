@@ -1,0 +1,6 @@
+<Application x:Class="OpenUninstaller.App" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" StartupUri="MainWindow.xaml">
+ <Application.Resources>
+  <SolidColorBrush x:Key="AccentBrush" Color="#2878C8"/>
+  <Style TargetType="Button"><Setter Property="Padding" Value="13,6"/><Setter Property="Margin" Value="3"/><Setter Property="MinHeight" Value="29"/></Style>
+ </Application.Resources>
+</Application>
