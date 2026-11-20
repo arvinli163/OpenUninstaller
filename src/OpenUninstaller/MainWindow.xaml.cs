@@ -4,7 +4,7 @@ using System.Windows;
 namespace OpenUninstaller;
 public partial class MainWindow:Window
 {
- readonly SoftwareScanner scanner=new();readonly UninstallService uninstaller=new();readonly SnapshotService snapshots=new();readonly DatabaseService db=new();List<InstalledApp> all=new();
+ readonly SoftwareScanner scanner=new();readonly UninstallService uninstaller=new();readonly SnapshotService snapshots=new();readonly DatabaseService db=new();readonly ResidualScanner residualScanner=new();List<InstalledApp> all=new();
  public MainWindow(){InitializeComponent();Loaded+=async(_,_)=>await RefreshAsync();}
  async Task RefreshAsync(){Busy(true,"扫描软件列表…");try{all=await Task.Run(scanner.Scan);Filter();StatusText.Text="扫描完成";}catch(Exception ex){MessageBox.Show(ex.Message);}finally{Busy(false);}}
  void Filter(){var q=SearchBox.Text.Trim();AppsGrid.ItemsSource=string.IsNullOrEmpty(q)?all:all.Where(x=>$"{x.Name} {x.Publisher} {x.Version}".Contains(q,StringComparison.OrdinalIgnoreCase)).ToList();CountText.Text=$"{AppsGrid.Items.Count} 个软件";}
@@ -17,6 +17,21 @@ public partial class MainWindow:Window
   foreach(var app in apps)try{uninstaller.Start(app);}catch(Exception ex){MessageBox.Show($"{app.Name}\n{ex.Message}","启动失败");}
   StatusText.Text="卸载程序已启动。完成后请刷新列表。";
  }
+
+ void Residual_Click(object s,RoutedEventArgs e)
+ {
+  if(AppsGrid.SelectedItem is not InstalledApp app){MessageBox.Show("请先选择一个软件。");return;}
+  try{var candidates=residualScanner.Find(app);new ResidualWindow(app,candidates){Owner=this}.ShowDialog();}
+  catch(Exception ex){MessageBox.Show(ex.Message,"残留扫描失败");}
+ }
+ void ForceUninstall_Click(object s,RoutedEventArgs e)
+ {
+  if(AppsGrid.SelectedItem is not InstalledApp app){MessageBox.Show("请先选择一个软件。");return;}
+  if(MessageBox.Show($"强制卸载会跳过厂商卸载程序，扫描可识别项目并交由你审核。\n目标：{app.Name}\n建议先尝试普通卸载。是否继续？","强制卸载确认",MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
+  try{var candidates=residualScanner.Find(app);new ResidualWindow(app,candidates){Owner=this}.ShowDialog();}
+  catch(Exception ex){MessageBox.Show(ex.Message,"强制卸载失败");}
+ }
+
  async void Monitor_Click(object s,RoutedEventArgs e){
   var dialog = new MonitorNameWindow { Owner = this }; if (dialog.ShowDialog() != true) return; var name = dialog.SessionName;
   try{

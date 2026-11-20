@@ -72,3 +72,12 @@ Windows 10/11 x64、.NET 8 SDK。安装版需要 Inno Setup 6。
 
 ## License
 MIT。第三方依赖遵循其各自许可证。
+
+
+## 第二阶段功能
+
+- **残留扫描**：基于软件名称/发行商，在当前用户 AppData、ProgramData、开始菜单和桌面提出候选项；并列出该软件原始卸载注册表项。名称匹配可能误报，必须人工审核。
+- **安全清理**：文件/目录移动到 `%LOCALAPPDATA%\OpenUninstaller\Quarantine`；卸载注册表项先通过 `reg.exe export` 备份再删除。不会自动清理 Program Files、Windows 目录、共享 DLL、服务或驱动。
+- **强制卸载**：跳过厂商卸载程序，进入残留候选审核流程；不是无确认的一键递归删除。
+- **实时监控接口**：`LiveInstallMonitor` 使用 `FileSystemWatcher` 观察指定目录。它属于用户态监控，存在缓冲区溢出/权限限制，不能称为内核级完整监控。
+- **内核驱动路线**：见 `driver/README.md`。本仓库未提供可加载、已签名的驱动。后续需用匹配版本 WDK 实现 Minifilter 与注册表回调，在隔离 VM 测试并按 Windows 签名要求发布。
