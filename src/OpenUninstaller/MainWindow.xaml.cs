@@ -46,7 +46,7 @@ public partial class MainWindow:Window
    if(dlg.ShowDialog()==true)
    {
     if(dlg.FileName.EndsWith(".msi",StringComparison.OrdinalIgnoreCase))
-     System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("msiexec.exe",$"/i \\"{dlg.FileName}\\""){UseShellExecute=true});
+     System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("msiexec.exe", $@"/i ""{dlg.FileName}""") { UseShellExecute = true });
     else System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(dlg.FileName){UseShellExecute=true});
    }
    if(MessageBox.Show("监控已启动。请完成软件安装，然后选择“是”结束监控并查看时间线。","安装监控",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)
