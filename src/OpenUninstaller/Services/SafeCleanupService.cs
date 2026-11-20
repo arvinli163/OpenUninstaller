@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.Win32;
 using OpenUninstaller.Models;
 using System.Diagnostics;
