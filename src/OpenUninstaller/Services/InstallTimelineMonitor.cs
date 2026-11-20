@@ -1,3 +1,4 @@
+using System.IO;
 using OpenUninstaller.Models;
 
 namespace OpenUninstaller.Services;
