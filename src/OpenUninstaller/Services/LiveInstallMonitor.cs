@@ -1,3 +1,4 @@
+using System.IO;
 namespace OpenUninstaller.Services;
 /// <summary>User-mode directory watcher only; not kernel-level and may overflow under heavy activity.</summary>
 public sealed class LiveInstallMonitor : IDisposable
