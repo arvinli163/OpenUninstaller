@@ -6,7 +6,7 @@
    <StackPanel Orientation="Horizontal"><Button Content="全选" Click="SelectAll_Click"/><Button Content="清理所选（隔离/备份）" Background="#2878C8" Foreground="White" Click="Cleanup_Click"/></StackPanel>
   </StackPanel>
   <DataGrid x:Name="ItemsGrid" AutoGenerateColumns="False" CanUserAddRows="False">
-   <DataGrid.Columns><DataGridCheckBoxColumn Header="选择" Binding="{Binding Selected,UpdateSourceTrigger=PropertyChanged}" Width="55"/><DataGridTextColumn Header="类型" Binding="{Binding Kind}" Width="100"/><DataGridTextColumn Header="风险" Binding="{Binding Risk}" Width="75"/><DataGridTextColumn Header="说明" Binding="{Binding Reason}" Width="2*"/><DataGridTextColumn Header="目标路径" Binding="{Binding Target}" Width="4*"/></DataGrid.Columns>
+   <DataGrid.Columns><DataGridCheckBoxColumn Header="选择" Binding="{Binding Selected,UpdateSourceTrigger=PropertyChanged}" Width="55"/><DataGridTextColumn Header="类型" Binding="{Binding Kind}" Width="100"/><DataGridTextColumn Header="置信度" Binding="{Binding Confidence}" Width="75"/><DataGridTextColumn Header="风险" Binding="{Binding Risk}" Width="75"/><DataGridTextColumn Header="说明" Binding="{Binding Reason}" Width="1.5*"/><DataGridTextColumn Header="关联证据" Binding="{Binding Evidence}" Width="2*"/><DataGridTextColumn Header="目标路径" Binding="{Binding Target}" Width="4*"/></DataGrid.Columns>
   </DataGrid>
  </DockPanel>
 </Window>

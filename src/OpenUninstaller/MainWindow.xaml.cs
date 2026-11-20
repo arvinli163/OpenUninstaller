@@ -32,16 +32,34 @@ public partial class MainWindow:Window
   catch(Exception ex){MessageBox.Show(ex.Message,"强制卸载失败");}
  }
 
- async void Monitor_Click(object s,RoutedEventArgs e){
-  var dialog = new MonitorNameWindow { Owner = this }; if (dialog.ShowDialog() != true) return; var name = dialog.SessionName;
-  try{
-   Busy(true,"创建安装前快照…");var p=new Progress<string>(x=>StatusText.Text=x);var before=await snapshots.CaptureAsync(p);var id=db.NewSession(name);
+ async void Monitor_Click(object s,RoutedEventArgs e)
+ {
+  var dialog=new MonitorNameWindow{Owner=this};if(dialog.ShowDialog()!=true)return;
+  var name=dialog.SessionName;long id=0;InstallTimelineMonitor? live=null;
+  try
+  {
+   Busy(true,"创建安装前快照…");var progress=new Progress<string>(x=>StatusText.Text=x);
+   var before=await snapshots.CaptureAsync(progress);id=db.NewSession(name);
+   live=new InstallTimelineMonitor();live.EventReceived+=ev=>{try{db.AddTimelineEvent(id,ev);}catch{}};
+   live.Start();
    var dlg=new Microsoft.Win32.OpenFileDialog{Title="选择安装程序（取消可自行安装）",Filter="安装程序|*.exe;*.msi|所有文件|*.*"};
-   if(dlg.ShowDialog()==true){if(dlg.FileName.EndsWith(".msi",StringComparison.OrdinalIgnoreCase))System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("msiexec.exe",$"/i \"{dlg.FileName}\""){UseShellExecute=true});else System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(dlg.FileName){UseShellExecute=true});}
-   if(MessageBox.Show("请完成软件安装，然后选择“是”进行安装后快照比较。","等待安装",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
-   Busy(true,"创建安装后快照…");var after=await snapshots.CaptureAsync(p);var changes=SnapshotService.Compare(before,after);db.Save(id,changes);
-   MessageBox.Show($"发现 {changes.Count} 项持久变化，已保存到本地 SQLite。\n\n注意：这是快照差异，不是内核级完整监控。","监控结果");
-   StatusText.Text=$"监控完成：{changes.Count} 项变化";
-  }catch(Exception ex){MessageBox.Show(ex.ToString(),"监控失败");}finally{Busy(false);}
+   if(dlg.ShowDialog()==true)
+   {
+    if(dlg.FileName.EndsWith(".msi",StringComparison.OrdinalIgnoreCase))
+     System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("msiexec.exe",$"/i \\"{dlg.FileName}\\""){UseShellExecute=true});
+    else System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(dlg.FileName){UseShellExecute=true});
+   }
+   if(MessageBox.Show("监控已启动。请完成软件安装，然后选择“是”结束监控并查看时间线。","安装监控",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)
+   {db.FinishSession(id,"用户提前结束监控");return;}
+   live.Dispose();live=null;
+   Busy(true,"创建安装后快照…");var after=await snapshots.CaptureAsync(progress);
+   var changes=SnapshotService.Compare(before,after);db.Save(id,changes);
+   var timeline=db.ReadTimeline(id);
+   new TimelineWindow(timeline){Owner=this}.ShowDialog();
+   MessageBox.Show($"快照差异 {changes.Count} 项；实时事件 {timeline.Count} 项。数据已保存到 SQLite。","监控完成");
+   StatusText.Text=$"监控完成：{changes.Count} 项快照变化 / {timeline.Count} 项实时事件";
+  }
+  catch(Exception ex){MessageBox.Show(ex.ToString(),"监控失败");}
+  finally{live?.Dispose();Busy(false);}
  }
 }

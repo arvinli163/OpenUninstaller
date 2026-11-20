@@ -1,0 +1,8 @@
+<Window x:Class="OpenUninstaller.TimelineWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="安装行为时间线" Height="620" Width="1100" WindowStartupLocation="CenterOwner">
+ <DockPanel Margin="12">
+  <StackPanel DockPanel.Dock="Top"><TextBlock Text="统一事件时间线" FontSize="18" FontWeight="Bold"/><TextBlock Text="文件、注册表和服务注册表事件按时间排序。用户态监控存在权限和缓冲区限制，不代表完整系统调用记录。" Foreground="DarkGoldenrod" Margin="0,5,0,8"/></StackPanel>
+  <DataGrid x:Name="EventsGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+   <DataGrid.Columns><DataGridTextColumn Header="时间" Binding="{Binding Timestamp,StringFormat={}{0:yyyy-MM-dd HH:mm:ss.fff}}" Width="190"/><DataGridTextColumn Header="类别" Binding="{Binding Category}" Width="110"/><DataGridTextColumn Header="动作" Binding="{Binding Action}" Width="170"/><DataGridTextColumn Header="目标" Binding="{Binding Target}" Width="3*"/><DataGridTextColumn Header="详情" Binding="{Binding Details}" Width="2*"/><DataGridTextColumn Header="来源" Binding="{Binding Source}" Width="170"/></DataGrid.Columns>
+  </DataGrid>
+ </DockPanel>
+</Window>
